@@ -1,0 +1,271 @@
+Login Test Cases
+=================
+
+File: Login_Test_Cases.txt
+Generated: 2026-01-07
+
+Overview
+--------
+This document contains plain-English manual test cases for the Login functionality. Each test case includes an ID, objective, preconditions, test data, step-by-step actions, expected results, pass/fail criteria, postconditions, and notes.
+
+TC_Login_001 — Login with valid credentials
+Objective:
+- Verify that a user can open the login page and sign in successfully using valid credentials.
+Preconditions:
+- Application is deployed and reachable.
+- Test account exists: username = user, password = pass.
+Test Data:
+- Username: user
+- Password: pass
+Steps:
+1. Open the application and navigate to the Login page.
+2. Enter Username: user
+3. Enter Password: pass
+4. Click the Login button.
+Expected Results:
+- The login page is visible with Username and Password fields and Login button.
+- After submission, user is authenticated and redirected to the dashboard or shown a welcome message (e.g., "Welcome, user").
+Pass/Fail:
+- Pass: User authenticated and sees expected authenticated UI; no error message.
+- Fail: Login rejected or error shown.
+Postconditions:
+- Log out to return to unauthenticated state if needed.
+Notes:
+- Corresponds to automation flow: performLogin() then login(user, pass).
+
+TC_Login_002 — Invalid password
+Objective:
+- Verify login fails when the username is valid but password is incorrect.
+Preconditions:
+- App reachable; valid username exists.
+Test Data:
+- Username: user
+- Password: wrongpass
+Steps:
+1. Open Login page.
+2. Enter username: user
+3. Enter password: wrongpass
+4. Click Login
+Expected Results:
+- Login is rejected and an appropriate error message is displayed (e.g., "Invalid credentials").
+- User remains on Login page and no authenticated UI elements appear.
+Pass/Fail:
+- Pass: Error message shown and no authentication.
+- Fail: Login succeeds or incorrect behavior occurs.
+
+TC_Login_003 — Invalid username
+Objective:
+- Verify login fails when the username does not exist.
+Preconditions:
+- App reachable.
+Test Data:
+- Username: unknownUser
+- Password: anypass
+Steps:
+1. Open Login page.
+2. Enter username: unknownUser
+3. Enter password: anypass
+4. Click Login
+Expected Results:
+- Error shown ("Invalid credentials" or "User not found").
+- No authentication.
+Pass/Fail:
+- Pass: Error shown and no access.
+
+TC_Login_004 — Empty username field
+Objective:
+- Verify validation when username is blank.
+Preconditions:
+- App reachable.
+Test Data:
+- Username: (empty)
+- Password: pass
+Steps:
+1. Open Login page.
+2. Leave Username empty; enter Password: pass
+3. Click Login
+Expected Results:
+- Inline validation or message indicating username is required.
+- Login not accepted.
+Pass/Fail:
+- Pass: Validation prevents login.
+
+TC_Login_005 — Empty password field
+Objective:
+- Verify validation when password is blank.
+Preconditions:
+- App reachable.
+Test Data:
+- Username: user
+- Password: (empty)
+Steps:
+1. Open Login page.
+2. Enter Username: user; leave Password empty
+3. Click Login
+Expected Results:
+- Validation that password is required; no login.
+Pass/Fail:
+- Pass: Validation shown and no authentication.
+
+TC_Login_006 — Both fields empty
+Objective:
+- Verify validation when both fields are left blank.
+Preconditions:
+- App reachable.
+Test Data:
+- Username: (empty)
+- Password: (empty)
+Steps:
+1. Open Login page.
+2. Leave both fields empty and click Login.
+Expected Results:
+- Required field validations appear; login blocked.
+Pass/Fail:
+- Pass: Both validations are shown and login is prevented.
+
+TC_Login_007 — SQL injection attempt
+Objective:
+- Verify inputs are sanitized and SQL injection strings do not bypass authentication.
+Preconditions:
+- App reachable (perform tests in a test environment).
+Test Data Examples:
+- Username: ' OR '1'='1
+- Password: ' OR '1'='1
+Steps:
+1. Open Login page.
+2. Enter the injection payload in username and/or password.
+3. Click Login.
+Expected Results:
+- Login fails; application returns a safe error (e.g., "Invalid credentials").
+- No DB error messages or stack traces are exposed.
+Pass/Fail:
+- Pass: Injection fails and no sensitive info is leaked.
+Notes:
+- Capture server logs if possible to confirm no SQL errors.
+
+TC_Login_008 — Cross‑Site Scripting (XSS) attempt in username
+Objective:
+- Verify inputs are sanitized and script payloads are not executed.
+Preconditions:
+- App reachable.
+Test Data:
+- Username: <script>alert(1)</script>
+- Password: pass
+Steps:
+1. Open Login page.
+2. Enter the XSS payload in the username field and valid/any password.
+3. Click Login.
+Expected Results:
+- Payload is treated as text; no script executes in the browser.
+- If echoed back, it should be HTML‑encoded.
+Pass/Fail:
+- Pass: No script execution observed.
+Notes:
+- Watch browser console for any unexpected JS execution or errors.
+
+TC_Login_009 — Extremely long input
+Objective:
+- Verify application handles very long input strings without crashing or leaking info.
+Preconditions:
+- App reachable.
+Test Data:
+- Username: 5000-character 'a' string
+- Password: 5000-character 'b' string
+Steps:
+1. Open Login page.
+2. Enter the long strings and click Login.
+Expected Results:
+- Input is rejected or handled gracefully (truncated/validated); app remains responsive.
+- No server errors or stack traces shown.
+Pass/Fail:
+- Pass: Application remains stable and shows an appropriate error.
+
+TC_Login_010 — Leading/trailing whitespace handling
+Objective:
+- Verify whether username/password inputs are trimmed according to system policy.
+Preconditions:
+- App reachable; test account exists.
+Test Data:
+- Username: " user " (spaces around)
+- Password: " pass "
+Steps:
+1. Open Login page.
+2. Enter credentials with leading/trailing spaces and click Login.
+Expected Results:
+- If system trims: login succeeds. If system treats spaces as significant: login fails. Document observed behavior.
+Pass/Fail:
+- Pass: Behavior matches documented/expected policy.
+
+TC_Login_011 — Special characters in password
+Objective:
+- Verify passwords containing special characters are accepted and handled correctly.
+Preconditions:
+- App reachable; account exists with special-char password.
+Test Data:
+- Username: user_special
+- Password: P@$$w0rd!
+Steps:
+1. Open Login page.
+2. Enter credentials and click Login.
+Expected Results:
+- Login succeeds; no encoding/processing errors.
+Pass/Fail:
+- Pass: Authentication successful and session created.
+
+TC_Login_012 — Account lockout after multiple failed attempts
+Objective:
+- Verify system locks account after N consecutive failed attempts per policy.
+Preconditions:
+- App reachable; test account exists and lockout threshold known.
+Test Data:
+- Username: user_lock
+- Password: wrongpass
+Steps:
+1. Attempt to log in with wrong credentials repeatedly until threshold is exceeded.
+2. Attempt to log in with correct credentials after lockout.
+Expected Results:
+- After threshold attempts, account is locked and correct credentials are rejected until unlocked.
+- Appropriate message shown (e.g., "Account locked").
+Pass/Fail:
+- Pass: Account locks per policy.
+Postconditions:
+- Unlock account or wait for policy timeout to restore access.
+
+TC_Login_013 — Case sensitivity of username/password
+Objective:
+- Verify whether username and password are case‑sensitive per system design.
+Preconditions:
+- App reachable; known user exists (e.g., MyUser / MyPass).
+Test Data:
+- Username variants: myuser, MYUSER
+- Password variants: mypass, MYPASS
+Steps:
+1. Attempt login using different case combinations for username and password.
+Expected Results:
+- Document whether username is case-insensitive (if applicable) and password is case-sensitive (recommended).
+Pass/Fail:
+- Pass: Behavior matches documented policy.
+
+TC_Login_014 — Time‑based injection / slow query attempt
+Objective:
+- Verify backend does not hang or degrade when given time‑based injection attempts (test only in safe test environments).
+Preconditions:
+- App reachable; test environment only.
+Test Data:
+- Payloads crafted to attempt slow SQL (use with extreme caution).
+Steps:
+1. Enter time-delay payloads in input fields and click Login.
+Expected Results:
+- System responds normally without excessive delay; request rejected and no resource exhaustion.
+Pass/Fail:
+- Pass: System remains responsive and rejects the payload.
+Notes:
+- Only perform in controlled test environments; do not run in production.
+
+Optional checks to consider with many of the above test cases
+- Verify HTTP status codes for API-based logins (e.g., 200 success, 401 unauthorized).
+- Confirm CSRF tokens are present on the login form.
+- After successful login, check cookies for Secure, HttpOnly, SameSite flags.
+- Attempt navigation to a protected resource to verify session/authentication.
+
+End of document
